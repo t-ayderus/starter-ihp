@@ -13,7 +13,9 @@ instance Controller CommentsController where
     --beforeAction = ensureIsUser
 
     action CommentsAction = do
-        comments <- query @Comment |> fetch
+        comments <- query @Comment 
+            |> orderByDesc #createdAt
+            |> fetch
         render IndexView { .. }
 
     action NewCommentAction { postId } = do
@@ -59,7 +61,8 @@ instance Controller CommentsController where
                         >>= pure . modify #comments (orderByDesc #createdAt)
                         >>= fetchRelated #comments
                     render ShowPostAction{ postId = comment.postId} -}
-                    redirectTo ShowPostAction { postId = comment.postId }
+                    
+                    jumpToAction ShowPostAction { postId = comment.postId }
 
     action DeleteCommentAction { commentId } = do
         comment <- fetch commentId

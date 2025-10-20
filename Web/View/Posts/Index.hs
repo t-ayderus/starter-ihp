@@ -8,7 +8,7 @@ instance View IndexView where
         {breadcrumb}
 
         <h1>Home
-            <a href={pathTo NewPostAction} class="btn btn-info ms-4">+ New</a> 
+            <a href={NewPostAction} class="btn btn-info ms-4">+ New</a> 
             {authButton}
           
         </h1>

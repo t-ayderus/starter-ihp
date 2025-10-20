@@ -16,7 +16,8 @@ instance Controller PostsController where
         render IndexView { .. }
         
     action NewPostAction = do
-        let post = newRecord
+        --ensureIsUser
+        let post = newRecord  |> set #userId currentUserId
         render NewView { .. }
            
 
@@ -27,7 +28,8 @@ instance Controller PostsController where
         render ShowView { .. }
 
     action EditPostAction { postId } = do
-        post <- fetch postId
+        post <- fetch postId     
+        accessDeniedUnless (post.userId == currentUserId)
         render EditView { .. }
 
     action UpdatePostAction { postId } = do
@@ -58,7 +60,6 @@ instance Controller PostsController where
                         |> orderByDesc #createdAt
                         |> fetch
                     render IndexView { .. }
-                    
                     --redirectTo PostsAction
 
     action DeletePostAction { postId } = do
@@ -68,7 +69,7 @@ instance Controller PostsController where
         redirectTo PostsAction
 
 buildPost post = post
-    |> fill @'["title", "body"]
+    |> fill @'["userId", "title", "body"]
     |> validateField #title nonEmpty
     |> validateField #body nonEmpty
     |> validateField #body nonEmpty

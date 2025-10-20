@@ -7,12 +7,12 @@ import Generated.Types
 
 data WebApplication = WebApplication deriving (Eq, Show)
 
-
+--userId :: !(Id User)
 data StaticController = WelcomeAction deriving (Eq, Show, Data)
 
 data PostsController
     = PostsAction
-    | NewPostAction
+    | NewPostAction 
     | ShowPostAction { postId :: !(Id Post) }
     | CreatePostAction
     | EditPostAction { postId :: !(Id Post) }
@@ -58,4 +58,14 @@ data ReactionsController
     | EditReactionAction { reactionId :: !(Id Reaction) }
     | UpdateReactionAction { reactionId :: !(Id Reaction) }
     | DeleteReactionAction { reactionId :: !(Id Reaction) }
+    deriving (Eq, Show, Data)
+
+data VotesController
+    = VotesAction
+    | NewVoteAction {postId :: !(Id Post), userId :: !( Id User)}
+    | ShowVoteAction { voteId :: !(Id Vote) }
+    | CreateVoteAction
+    | EditVoteAction { voteId :: !(Id Vote) }
+    | UpdateVoteAction { voteId :: !(Id Vote) }
+    | DeleteVoteAction { voteId :: !(Id Vote) }
     deriving (Eq, Show, Data)

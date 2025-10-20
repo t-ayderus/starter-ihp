@@ -11,8 +11,9 @@ instance View ShowView where
         <h1>{post.title}</h1>
         <p>{post.createdAt |> timeAgo}</p>
         <p>{post.body |> renderMarkdown}</p>
-        <a href ={NewCommentAction post.id}> Add Comment </a>
 
+        <a href = {NewVoteAction post.id currentUserId } class="me-3"> Vote </a>
+        <a href ={NewCommentAction post.id}> Add Comment </a>
         <body>
             {modal}
         </body>
@@ -32,6 +33,7 @@ renderMarkdown text =
 renderComment comment = [hsx| 
        <div class="mt-4">
             <h5>{comment.author}</h5>
+            <p>{comment.createdAt |> timeAgo} </p>
             <p>{comment.body}</p>
             <td><a href={DeleteCommentAction comment.id} class="js-delete text-muted">Delete</a></td>
         </div>

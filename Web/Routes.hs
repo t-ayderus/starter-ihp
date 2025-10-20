@@ -16,3 +16,6 @@ instance AutoRoute UsersController
 
 instance AutoRoute ReactionsController
 
+
+instance AutoRoute VotesController
+

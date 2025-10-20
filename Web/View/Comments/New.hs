@@ -1,7 +1,6 @@
 module Web.View.Comments.New where
 import Web.View.Prelude
 
-
 data NewView = NewView { comment :: Comment, post :: Post }
 --  <h1>New Comment for <q>{post.title}</q></h1>
 --  {breadcrumb}
@@ -21,6 +20,6 @@ renderForm :: Comment -> Html
 renderForm comment = formFor comment [hsx|
     {(hiddenField #postId)}
     {(hiddenField #author)}
-    {(textField #body)}
+    {(textField #body) { disableLabel = True}}
     {submitButton}
 |] 
