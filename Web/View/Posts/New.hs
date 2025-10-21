@@ -17,7 +17,7 @@ instance View NewView where
 
 renderForm :: Post -> Html
 renderForm post = formFor post [hsx|
-    {textField #userId}
+    {hiddenField #userId}
     {(textField #title)}
     {(textareaField #body) {helpText = "You can use Markdown Here"}}
     {submitButton}

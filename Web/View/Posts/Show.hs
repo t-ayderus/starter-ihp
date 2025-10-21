@@ -36,6 +36,7 @@ renderComment comment = [hsx|
             <p>{comment.createdAt |> timeAgo} </p>
             <p>{comment.body}</p>
             <td><a href={DeleteCommentAction comment.id} class="js-delete text-muted">Delete</a></td>
+            
         </div>
     |]
 

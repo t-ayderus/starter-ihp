@@ -64,6 +64,7 @@ instance Controller PostsController where
 
     action DeletePostAction { postId } = do
         post <- fetch postId
+        accessDeniedUnless (post.userId == currentUserId)
         deleteRecord post
         setSuccessMessage "Post deleted"
         redirectTo PostsAction
