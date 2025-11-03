@@ -19,8 +19,10 @@ instance Controller CommentsController where
         render IndexView { .. }
 
     action NewCommentAction { postId } = do
+        ensureIsUser
         post <- fetch postId
-        let comment = newRecord |> set #postId postId |> set #author currentUser.email
+        let user = currentUser
+        let comment = newRecord |> set #postId postId |> set #author currentUser.email |> set #userId currentUserId
         setModal NewView{ .. }
 
         jumpToAction ShowPostAction {..}
@@ -32,6 +34,7 @@ instance Controller CommentsController where
 
     action EditCommentAction { commentId } = do
         comment <- fetch commentId
+        accessDeniedUnless (comment.userId == currentUserId)
         render EditView { .. }
 
     action UpdateCommentAction { commentId } = do
@@ -46,6 +49,7 @@ instance Controller CommentsController where
                     redirectTo EditCommentAction { .. }
 
     action CreateCommentAction = do
+        let userId = currentUserId
         let comment = newRecord @Comment
         comment
             |> buildComment
@@ -56,19 +60,16 @@ instance Controller CommentsController where
                     render NewView{..}
                 Right comment -> do
                     comment <- comment |> createRecord
-                    setSuccessMessage "Comment created"
-                    {-post <- fetch comment.postId
-                        >>= pure . modify #comments (orderByDesc #createdAt)
-                        >>= fetchRelated #comments
-                    render ShowPostAction{ postId = comment.postId} -}
-                    
+                    setSuccessMessage "Comment created"  
                     jumpToAction ShowPostAction { postId = comment.postId }
 
     action DeleteCommentAction { commentId } = do
         comment <- fetch commentId
+        accessDeniedUnless (comment.userId == currentUserId)
         deleteRecord comment
         setSuccessMessage "Comment deleted"
-        redirectTo CommentsAction
+        jumpToAction ShowPostAction { postId = comment.postId }
+
 
 buildComment comment = comment
-    |> fill @'["postId", "author", "body"]
+    |> fill @'["postId", "author", "body", "userId"]

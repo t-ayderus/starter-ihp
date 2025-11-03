@@ -5,14 +5,15 @@ import Web.View.Votes.Index
 import Web.View.Votes.New
 import Web.View.Votes.Edit
 import Web.View.Votes.Show
+import Web.Controller.Posts
 
 instance Controller VotesController where
     action VotesAction = do
         votes <- query @Vote |> fetch
         render IndexView { .. }
 
-    action NewVoteAction { postId, userId } = do
-        let vote = newRecord |> set #postId postId |> set #userId userId
+    action NewVoteAction { postId, userId} = do
+        let vote = newRecord |> set #postId postId |> set #userId userId 
         post <- fetch postId
         render NewView { .. }
 
@@ -36,15 +37,43 @@ instance Controller VotesController where
                     redirectTo EditVoteAction { .. }
 
     action CreateVoteAction = do
-        let vote = newRecord @Vote
-        vote
-            |> buildVote
-            |> ifValid \case
-                Left vote -> render NewView { .. } 
-                Right vote -> do
-                    vote <- vote |> createRecord
-                    setSuccessMessage "Vote created"
-                    redirectTo VotesAction
+        ensureIsUser
+        let postId = param @(Id Post) "postId"
+        let ballot = param @Int "ballot"
+        let userId = currentUserId
+
+        existing <- query @Vote
+            |> filterWhere (#postId, postId)
+            |> filterWhere (#userId, userId)
+            |> fetchOneOrNothing
+
+        case existing of
+            Just r -> 
+                if get #ballot r == ballot 
+                    then do
+                        deleteRecord r
+                        setSuccessMessage "Reaction removed"
+                        jumpToAction ShowPostAction { postId }
+            -- Different emoji -> switch to the new one
+                    else do
+                        _ <- r 
+                            |> set #ballot ballot 
+                            |> updateRecord
+                        setSuccessMessage "Vote updated"
+                        jumpToAction ShowPostAction { postId }
+
+            -- No reaction yet -> create
+            Nothing -> do
+                _ <- newRecord @Vote
+                    |> set #postId postId
+                    |> set #userId userId        
+                    |> set #ballot  ballot
+                    |> createRecord
+                setSuccessMessage "Reaction added"
+                jumpToAction ShowPostAction { postId }
+
+       
+
 
     action DeleteVoteAction { voteId } = do
         vote <- fetch voteId
@@ -53,4 +82,4 @@ instance Controller VotesController where
         redirectTo VotesAction
 
 buildVote vote = vote
-    |> fill @'["vote", "userId"]
+    |> fill @'["ballot", "userId", "postId"]

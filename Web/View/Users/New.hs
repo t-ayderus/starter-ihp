@@ -20,7 +20,7 @@ renderForm user = formFor user [hsx|
     {(textField #email)}
     {(textField #passwordHash) {fieldLabel= "Password", required = True}}
     {(passwordField #passwordHash) { required = True, fieldLabel = "Password confirmation", fieldName = "passwordConfirmation", validatorResult = Nothing }}
-    {(textField #failedLoginAttempts)}
+    {(hiddenField #failedLoginAttempts)}
     {submitButton}
 
 |]

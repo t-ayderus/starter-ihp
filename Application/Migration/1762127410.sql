@@ -1,0 +1,1 @@
+ALTER TABLE reactions ALTER COLUMN comment_id DROP NOT NULL;

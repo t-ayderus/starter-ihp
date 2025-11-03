@@ -18,6 +18,7 @@ instance View NewView where
 --made author hidden if it breaks
 renderForm :: Comment -> Html
 renderForm comment = formFor comment [hsx|
+    {(hiddenField) #userId}
     {(hiddenField #postId)}
     {(hiddenField #author)}
     {(textField #body) { disableLabel = True}}

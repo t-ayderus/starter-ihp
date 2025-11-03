@@ -8,7 +8,6 @@ import Web.View.Posts.Show
 import qualified Text.MMark as MMark
 
 instance Controller PostsController where
-    --beforeAction = ensureIsUser
     action PostsAction = do
         posts <- query @Post 
             |> orderByDesc #createdAt
@@ -16,7 +15,7 @@ instance Controller PostsController where
         render IndexView { .. }
         
     action NewPostAction = do
-        --ensureIsUser
+        ensureIsUser
         let post = newRecord  |> set #userId currentUserId
         render NewView { .. }
            
@@ -25,7 +24,13 @@ instance Controller PostsController where
         post <- fetch postId
             >>= pure . modify #comments (orderByDesc #createdAt)
             >>= fetchRelated #comments
-        render ShowView { .. }
+        reactions <- query @Reaction
+            |> filterWhere (#postId, postId)
+            |> fetch
+        votes <- query @Vote
+            |> filterWhere (#postId, postId)
+            |> fetch
+        render ShowView {..}
 
     action EditPostAction { postId } = do
         post <- fetch postId     
@@ -45,6 +50,12 @@ instance Controller PostsController where
                     post <- fetch postId
                         >>= pure . modify #comments (orderByDesc #createdAt)
                         >>= fetchRelated #comments
+                    reactions <- query @Reaction
+                         |> filterWhere (#postId, postId)
+                         |> fetch
+                    votes <- query @Vote
+                        |> filterWhere (#postId, postId)
+                        |> fetch
                     render ShowView { .. }
 
     action CreatePostAction = do
