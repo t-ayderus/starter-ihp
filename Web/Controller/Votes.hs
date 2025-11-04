@@ -48,21 +48,18 @@ instance Controller VotesController where
             |> fetchOneOrNothing
 
         case existing of
-            Just r -> 
-                if get #ballot r == ballot 
+            Just val -> 
+                if get #ballot val == ballot 
                     then do
-                        deleteRecord r
+                        deleteRecord val
                         setSuccessMessage "Reaction removed"
                         jumpToAction ShowPostAction { postId }
-            -- Different emoji -> switch to the new one
                     else do
-                        _ <- r 
+                        _ <- val 
                             |> set #ballot ballot 
                             |> updateRecord
                         setSuccessMessage "Vote updated"
                         jumpToAction ShowPostAction { postId }
-
-            -- No reaction yet -> create
             Nothing -> do
                 _ <- newRecord @Vote
                     |> set #postId postId

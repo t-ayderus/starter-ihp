@@ -44,7 +44,6 @@ instance View ShowView where
             <button 
                 type="submit" 
                 class="border rounded px-2 hover:bg-gray-100"
-
             >❤️{renderCount (numReactions reactions "❤️") }
             </button>
         </form>
@@ -55,7 +54,6 @@ instance View ShowView where
             <button 
                 type="submit" 
                 class="border rounded px-2 hover:bg-gray-100"
-
             >😂{renderCount (numReactions reactions "😂") }
             </button>
         </form>

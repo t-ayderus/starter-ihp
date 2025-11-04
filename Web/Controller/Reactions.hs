@@ -51,21 +51,18 @@ instance Controller ReactionsController where
             |> fetchOneOrNothing
 
         case existing of
-            Just r -> 
-                if get #emoji r == emoji 
+            Just react -> 
+                if get #emoji react == emoji 
                     then do
-                        deleteRecord r
+                        deleteRecord react
                         setSuccessMessage "Reaction removed"
                         jumpToAction ShowPostAction { postId }
-            -- Different emoji -> switch to the new one
                     else do
-                        _ <- r 
+                        _ <- react 
                             |> set #emoji emoji 
                             |> updateRecord
                         setSuccessMessage "Reaction updated"
                         jumpToAction ShowPostAction { postId }
-
-            -- No reaction yet -> create
             Nothing -> do
                 _ <- newRecord @Reaction
                     |> set #postId postId
